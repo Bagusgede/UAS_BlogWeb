@@ -86,5 +86,58 @@
         </p>
       </div>
     </div>
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+      crossorigin="anonymous"
+    ></script>
+
+    <script type="module">
+      import { login } from "./api/server.js";
+
+      function setCookie(name, value, days) {
+        const date = new Date();
+        date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000); // Convert days to milliseconds
+        const expires = "expires=" + date.toUTCString();
+        document.cookie = `${name}=${encodeURIComponent(
+          JSON.stringify(value)
+        )}; ${expires}`;
+      }
+
+      function getCookie(name) {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.startsWith(name + "=")) {
+            return JSON.parse(
+              decodeURIComponent(cookie.substring(name.length + 1))
+            );
+          }
+        }
+        return null; // Return null if cookie not found
+      }
+
+      async function loginUser(email, password) {
+        const data = await login(email, password);
+        console.log(data);
+
+        if (data.token) {
+          const idUser = data.token.split("|")[0];
+          console.log(idUser);
+          setCookie("token", data, 7); // Simpan selama 7 hari
+          setCookie("id", idUser, 7);
+          alert("Login berhasil, data disimpan di cookie!");
+          window.location.href = "/index.html";
+        } else {
+          alert("Login gagal, username dan password tidak sesuai!");
+        }
+      }
+
+      $("#submit").click(() => {
+        let email = $("#email").val();
+        let password = $("#password").val();
+        loginUser(email, password);
+      });
+    </script>
   </body>
 </html>
