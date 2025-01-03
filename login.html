@@ -93,7 +93,7 @@
     ></script>
 
     <script type="module">
-      import { login } from "./api/server.js";
+      import { login, loggedUser } from "./api/server.js";
 
       function setCookie(name, value, days) {
         const date = new Date();
@@ -122,10 +122,11 @@
         console.log(data);
 
         if (data.token) {
-          const idUser = data.token.split("|")[0];
-          console.log(idUser);
+          const user = await loggedUser(data.token);
+
           setCookie("token", data, 7); // Simpan selama 7 hari
-          setCookie("id", idUser, 7);
+          setCookie("user", user, 7);
+
           alert("Login berhasil, data disimpan di cookie!");
           window.location.href = "/index.html";
         } else {
