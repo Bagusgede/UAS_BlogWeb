@@ -33,10 +33,9 @@ async function login(email, password) {
     body: JSON.stringify({ email, password }),
   });
 
-  const responses = await response.json();
-  return responses;
+  const data = await response.json();
+  return data;
 }
-
 // Fungsi untuk register API POST
 async function register(name,email,password,confirmPassword) { 
   // console.log('base url!!'+ base_url);
