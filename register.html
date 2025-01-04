@@ -105,5 +105,60 @@
         </div>
       </div>
     </div>
+    <script
+    src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+    crossorigin="anonymous"
+  ></script>
+  <script type="module">
+  import { login,loggedUser } from "./api/server.js";
+
+
+      function setCookie(name, value, days) {
+        const date = new Date();
+        date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000); // Convert days to milliseconds
+        const expires = "expires=" + date.toUTCString();
+        document.cookie = `${name}=${encodeURIComponent(
+          JSON.stringify(value)
+        )}; ${expires}`;
+      }
+
+      function getCookie(name) {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.startsWith(name + "=")) {
+            return JSON.parse(
+              decodeURIComponent(cookie.substring(name.length + 1))
+            );
+          }
+        }
+        return null; // Return null if cookie not found
+      }
+      async function registerUser(name,email,password,confirmPassword) {
+        const data = await register(name,email,password,confirmPassword);
+        console.log(data);
+
+        if (data.token) {
+          const user = await loggedUser(data.token);
+          setCookie("token", data, 7); // Simpan selama 7 hari
+          setCookie("user", user, 7);
+          alert("Login berhasil, data disimpan di cookie!");
+          window.location.href = "/index.html";
+        } else {
+          alert("Login gagal, username dan password tidak sesuai!");
+        }
+      }
+
+      $("#submit").click(() => {
+        let name = $("#name").val();
+        let email = $("#email").val();
+        let password = $("#password").val();
+        let confirmPassword = $("#confirmPassword").val();
+        registerUser(name,email,password,confirmPassword);
+      });
+
+
+  </script>
   </body>
 </html>
