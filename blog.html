@@ -227,7 +227,11 @@
     ></script>
 
     <script type="module">
-      import { getBlog, formatTanggal } from "./api/products/blog.js";
+      import {
+        getBlog,
+        formatTanggal,
+        deleteBlog,
+      } from "./api/products/blog.js";
 
       async function loadBlog() {
         try {
@@ -284,7 +288,29 @@
           console.error("Failed to load products:", error);
         }
       }
+      // manggil fungsi untuk memuat data blog terbaru
       loadBlog();
+      $(document).on("click", ".delete", async function () {
+        // ambil data berdasarkan id di atribut div foreach
+        let id = $(this).attr("data-id");
+        console.log(id);
+
+        if (confirm("apakah yakin data akan di hapus bri ")) {
+          try {
+            const response = await deleteBlog(id);
+            console.log(response);
+            if (response) {
+              alert("oke bang udah di hapus :)");
+              loadBlog();
+            } else {
+              alert("Gagal di hapus bang");
+            }
+          } catch (error) {
+            console.error("error Delete datanya bang:", error);
+            alert("datanya ada yang salah nih");
+          }
+        }
+      });
     </script>
   </body>
 </html>

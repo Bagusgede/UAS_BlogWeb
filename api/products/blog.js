@@ -66,4 +66,29 @@ async function getBlog() {
     return [];
   }
 }
-export { getBlog, formatTanggal };
+// function Delete blog berdasarkan id blog
+   async function deleteBlog(id){
+
+  try{
+    const response = await fetch(`${base_url}/${id}`, {
+      method: 'POST',
+      headers: {
+        'Authorization' : `Bearer ${token.token}`,
+        'Content-Type' : 'application/json'
+      },
+      body: JSON.stringify({
+        '_method': "delete",
+      }),
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    console.log(response);
+    const data = await response.json();
+    return data; // Kembalikan data response, misalnya { success: true } jika berhasil
+  }catch (error){
+      console.error("Gagal menghapus data blog:", error);
+      return[];
+  }
+ }
+export { getBlog, formatTanggal,deleteBlog };
