@@ -216,35 +216,74 @@
             </tr>
           </thead>
           <!-- body content -->
-          <tbody>
-            <tr>
-              <td>
-                <img src="" alt="" class="uk-preserve-width uk-border-circle" />
-              </td>
-              <td class="uk-table-link">
-                <a class="uk-text-nowrap" href="#">Title</a>
-              </td>
-              <td class="uk-text-truncate">
-                <p>Content</p>
-              </td>
-              <td class="uk-text">
-                <p>format tanggal created</p>
-              </td>
-              <td class="uk-text">
-                <p>Format tanggal update</p>
-              </td>
-              <td>
-                <a href="#" class="uk-button uk-button-primary update"
-                  >Update</a
-                >
-              </td>
-              <td>
-                <div class="uk-button uk-button-primary delete">Delete</div>
-              </td>
-            </tr>
-          </tbody>
+          <tbody id="data"></tbody>
         </table>
       </div>
     </div>
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+      crossorigin="anonymous"
+    ></script>
+
+    <script type="module">
+      import { getBlog, formatTanggal } from "./api/products/blog.js";
+
+      async function loadBlog() {
+        try {
+          // Panggil API
+          const datas = await getBlog();
+
+          console.log(datas);
+
+          // Bersihkan isi tbody (jika ada data sebelumnya)
+          $("#data").empty();
+
+          // Loop melalui data produk dan buat baris tabel untuk setiap item
+          datas.forEach((data) => {
+            const row = `
+            <tr>
+              <td>
+                <img
+                  class="uk-preserve-width uk-border-circle"
+                  src="${data.image || "https://via.placeholder.com/40"}"
+                  width="40"
+                  height="40"
+                  alt="Product Image"
+                />
+              </td>
+              <td class="uk-table-link">
+                <a class="uk-text-nowrap" href="#">${data.title || ""}</a>
+              </td>
+              <td class="uk-text-truncate">
+                ${data.content || ""}
+              </td>
+              <td class="uk-text">
+                ${formatTanggal(data.created_at) || ""}
+              </td>
+              <td class="uk-text">
+                ${formatTanggal(data.updated_at) || ""}
+              </td>
+              <td>
+                <a href="updateBlog.html?slug=${
+                  data.slug
+                }" class="uk-button uk-button-primary update" >Update</a>
+              </td>
+              <td>
+                <div class="uk-button uk-button-danger delete" data-id="${
+                  data.id
+                }">Delete</div>
+              </td>
+            </tr>
+          `;
+
+            // Tambahkan <tr> ke dalam <tbody> dengan jQuery
+            $("#data").append(row);
+          });
+        } catch (error) {
+          console.error("Failed to load products:", error);
+        }
+      }
+    </script>
   </body>
 </html>
