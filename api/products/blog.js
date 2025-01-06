@@ -66,6 +66,31 @@ async function getBlog() {
     return [];
   }
 }
+// function ambil data berdasarkan slug yang ada di permasing masing id
+async function ambilDataBlog(slug) {
+  try{
+    const response = await fetch(`${base_url}/${slug}`,{
+      method: "GET",
+      headers: {
+        'Authorization': `Bearer ${token.token}`,
+        'Content-Type': 'application/json'
+    },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      console.log(response);
+      
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      return [];
+    }
+    
+
+  }
+
 // function CreateBlog
 async function createBlog(imageFile,title,content) {
   try{
@@ -93,6 +118,42 @@ async function createBlog(imageFile,title,content) {
     return error;
   }
 }
+
+// function update  Blog
+async function updateBlog(imageFile,title,content,idBlog ) { 
+  // console.log('base url!!'+ base_url);
+  try {
+      const formData = new FormData();
+      formData.append("image", imageFile); // Tambahkan file gambar
+      formData.append("title", title); // Tambahkan judul
+      formData.append("_method", "put"); // Tambahkan judul
+      formData.append("content", content); // Tambahkan konten
+      console.log(formData);
+      
+
+      const response = await fetch(`${base_url}/${idBlog}` , {    
+        method: "POST",
+        headers: {
+          'Authorization': `Bearer ${token.token}` 
+        },
+        body: formData, // Kirim data sebagai FormData
+      });
+      console.log(response);
+      
+
+      if (!response.ok) {
+        // const errorText = await response.text();
+        // console.error("Server Error:", errorText);
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Terjadi kesalahan saat membuat blog:", error);
+      return error;
+    }
+}
 // function Delete blog berdasarkan id blog
    async function deleteBlog(id){
 
@@ -118,4 +179,4 @@ async function createBlog(imageFile,title,content) {
       return[];
   }
  }
-export { getBlog, formatTanggal,deleteBlog, createBlog };
+export { getBlog, formatTanggal,deleteBlog, createBlog, updateBlog, ambilDataBlog };
