@@ -66,6 +66,33 @@ async function getBlog() {
     return [];
   }
 }
+// function CreateBlog
+async function createBlog(imageFile,title,content) {
+  try{
+    const formData = new FormData();
+    formData.append("image", imageFile); //tambahkan file gambar
+    formData.append("title", title); //tambahkan title
+    formData.append("author_id", user.id); //tambahkan id create blog user
+    formData.append("content", content); //tambahkan content
+
+    const response = await fetch(base_url + "/store", {
+      method: "POST",
+      headers:{
+        'Authorization': `Bearer ${token.token}`
+      },
+      body: formData, // kirim data sebagai formData
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data =  await response.json();
+    return data;
+  }catch (error){
+    console.error("Terjadi kesalahan saat membuat blog:", error);
+    return error;
+  }
+}
 // function Delete blog berdasarkan id blog
    async function deleteBlog(id){
 
@@ -91,4 +118,4 @@ async function getBlog() {
       return[];
   }
  }
-export { getBlog, formatTanggal,deleteBlog };
+export { getBlog, formatTanggal,deleteBlog, createBlog };

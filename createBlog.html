@@ -249,5 +249,39 @@
         </button>
       </form>
     </div>
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+      crossorigin="anonymous"
+    ></script>
+
+    <script type="module">
+      import { createBlog } from "./api/products/blog.js";
+
+      const form = document.getElementById("blogForm");
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        // console.log("ada");
+
+        const imageFile = document.getElementById("image").files[0];
+        const title = document.getElementById("title").value;
+        const content = document.getElementById("content").value;
+
+        if (!imageFile || !title || !content) {
+          alert("Semua data wajib diisi!");
+          return;
+        }
+        const result = await createBlog(imageFile, title, content);
+
+        if (result) {
+          alert("Blog berhasil di buat");
+          form.reset();
+          console.log(result);
+        } else {
+          alert("Gagal membuat blog.");
+        }
+      });
+    </script>
   </body>
 </html>
