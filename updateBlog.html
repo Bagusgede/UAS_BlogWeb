@@ -256,5 +256,72 @@
       integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
       crossorigin="anonymous"
     ></script>
+
+    <script type="module">
+      import { updateBlog, ambilDataBlog } from "./api/products/blog.js";
+
+      // Panggil fungsi ini dengan slug tertentu saat halaman dimuat
+      document.addEventListener("DOMContentLoaded", async () => {
+        const params = new URLSearchParams(window.location.search);
+        const slug = params.get("slug"); // ganti dengan slug yang sesuai
+
+        const data = await ambilDataBlog(slug);
+        console.log(data);
+
+        if (!data) {
+          alert("Gagal mengambil data BLOG");
+          return;
+        }
+
+        // Isi form dengan data yang diambil
+        document.getElementById("title").value = data.title || "";
+        document.getElementById("content").value = data.content || "";
+        document.getElementById("idBlog").value = data.id || "";
+
+        // Menampilkan gambar jika tersedia
+        if (data.image) {
+          const imageContainer = document.createElement("div");
+          imageContainer.id = "image-preview";
+          imageContainer.classList.add("uk-margin");
+
+          const imageElement = document.createElement("img");
+          imageElement.src = data.image;
+          imageElement.alt = "Blog Image";
+          imageElement.classList.add("uk-border-rounded", "uk-width-medium");
+
+          imageContainer.appendChild(imageElement);
+
+          const form = document.getElementById("updateForm");
+          form.insertBefore(imageContainer, form.querySelector("button"));
+        }
+      });
+
+      const form = document.getElementById("updateForm");
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        console.log("ada");
+
+        const imageFile = document.getElementById("image").files[0];
+        const title = document.getElementById("title").value;
+        const content = document.getElementById("content").value;
+        const idBlog = document.getElementById("idBlog").value;
+        // ngecek ttitle nya aja biar tau datanya masuk apa enggak
+        console.log(title);
+
+        if (!imageFile || !title || !content) {
+          alert("Isiin semua datanya bang");
+          return;
+        }
+        const result = await updateBlog(imageFile, title, content, idBlog);
+        if (result) {
+          alert("Blog berhasil di update!");
+          window.location.href = "/blog.html";
+          form.reset();
+        } else {
+          alert("Gagal membuat blog.");
+        }
+      });
+    </script>
   </body>
 </html>
