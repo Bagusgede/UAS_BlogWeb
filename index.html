@@ -93,7 +93,41 @@
     ></script>
 
     <script type="module">
-      import { login, loggedUser } from "./api/server.js";
+      let base_url = "https://primdev.alwaysdata.net/api";
+
+      // Fungsi untuk memanggil API POST
+
+      async function loggedUser(token) {
+        // console.log('base url!!'+ base_url);
+
+        const response = await fetch(base_url + "/user", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await response.json();
+
+        return data;
+      }
+
+      // Fungsi untuk memanggil API POST
+      async function login(email, password) {
+        // console.log('base url!!'+ base_url);
+
+        const response = await fetch(base_url + "/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await response.json();
+        return data;
+      }
 
       function setCookie(name, value, days) {
         const date = new Date();

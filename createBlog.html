@@ -256,7 +256,51 @@
     ></script>
 
     <script type="module">
-      import { createBlog } from "./api/products/blog.js";
+      let base_url = "https://primdev.alwaysdata.net/api/blog"; // base url dari API
+
+      function getCookie(name) {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.startsWith(name + "=")) {
+            return JSON.parse(
+              decodeURIComponent(cookie.substring(name.length + 1))
+            );
+          }
+        }
+        return null; // Return null if cookie not found
+      }
+
+      const token = getCookie("token");
+      const user = getCookie("user");
+      // function CreateBlog
+
+      async function createBlog(imageFile, title, content) {
+        try {
+          const formData = new FormData();
+          formData.append("image", imageFile); //tambahkan file gambar
+          formData.append("title", title); //tambahkan title
+          formData.append("author_id", user.id); //tambahkan id create blog user
+          formData.append("content", content); //tambahkan content
+
+          const response = await fetch(base_url + "/store", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token.token}`,
+            },
+            body: formData, // kirim data sebagai formData
+          });
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          return data;
+        } catch (error) {
+          console.error("Terjadi kesalahan saat membuat blog:", error);
+          return error;
+        }
+      }
 
       const form = document.getElementById("blogForm");
 

@@ -227,11 +227,102 @@
     ></script>
 
     <script type="module">
-      import {
-        getBlog,
-        formatTanggal,
-        deleteBlog,
-      } from "./api/products/blog.js";
+      let base_url = "https://primdev.alwaysdata.net/api/blog"; // base url dari API
+
+      function getCookie(name) {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.startsWith(name + "=")) {
+            return JSON.parse(
+              decodeURIComponent(cookie.substring(name.length + 1))
+            );
+          }
+        }
+        return null; // Return null if cookie not found
+      }
+
+      const token = getCookie("token");
+      const user = getCookie("user");
+
+      async function getBlog() {
+        // const response = await fetch(base_url+'/author/1');
+        // const data = await response.json();
+        // return data;
+
+        if (!user || !token) {
+          console.error("ID pengguna atau token tidak ditemukan.");
+          return []; // Kembalikan array kosong jika tidak ada data
+        }
+
+        try {
+          const response = await fetch(base_url + "/author/" + user.id, {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token.token}`,
+              "Content-Type": "application/json",
+            },
+          });
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          console.log(response);
+
+          const data = await response.json();
+          console.log("Data blog berhasil diambil:", data);
+          return data;
+        } catch (error) {
+          console.error("Gagal mengambil data blog:", error);
+          return [];
+        }
+      }
+
+      //format tanggal
+      function formatTanggal(isoString) {
+        const bulan = [
+          "Januari",
+          "Februari",
+          "Maret",
+          "April",
+          "Mei",
+          "Juni",
+          "Juli",
+          "Agustus",
+          "September",
+          "Oktober",
+          "November",
+          "Desember",
+        ];
+        const date = new Date(isoString);
+        return `${date.getDate()} ${
+          bulan[date.getMonth()]
+        } ${date.getFullYear()}`;
+      }
+
+      // function Delete blog berdasarkan id blog
+      async function deleteBlog(id) {
+        try {
+          const response = await fetch(`${base_url}/${id}`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token.token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              _method: "delete",
+            }),
+          });
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          console.log(response);
+          const data = await response.json();
+          return data; // Kembalikan data response, misalnya { success: true } jika berhasil
+        } catch (error) {
+          console.error("Gagal menghapus data blog:", error);
+          return [];
+        }
+      }
 
       async function loadBlog() {
         try {
@@ -246,40 +337,40 @@
           // Loop melalui data produk dan buat baris tabel untuk setiap item
           datas.forEach((data) => {
             const row = `
-            <tr>
-              <td>
-                <img
-                  class="uk-preserve-width uk-border-circle"
-                  src="${data.image || "https://via.placeholder.com/40"}"
-                  width="40"
-                  height="40"
-                  alt="Product Image"
-                />
-              </td>
-              <td class="uk-table-link">
-                <a class="uk-text-nowrap" href="#">${data.title || ""}</a>
-              </td>
-              <td class="uk-text-truncate">
-                ${data.content || ""}
-              </td>
-              <td class="uk-text">
-                ${formatTanggal(data.created_at) || ""}
-              </td>
-              <td class="uk-text">
-                ${formatTanggal(data.updated_at) || ""}
-              </td>
-              <td>
-                <a href="updateBlog.html?slug=${
-                  data.slug
-                }" class="uk-button uk-button-primary update" >Update</a>
-              </td>
-              <td>
-                <div class="uk-button uk-button-danger delete" data-id="${
-                  data.id
-                }">Delete</div>
-              </td>
-            </tr>
-          `;
+                  <tr>
+                    <td>
+                      <img
+                        class="uk-preserve-width uk-border-circle"
+                        src="${data.image || "https://via.placeholder.com/40"}"
+                        width="40"
+                        height="40"
+                        alt="Product Image"
+                      />
+                    </td>
+                    <td class="uk-table-link">
+                      <a class="uk-text-nowrap" href="#">${data.title || ""}</a>
+                    </td>
+                    <td class="uk-text-truncate">
+                      ${data.content || ""}
+                    </td>
+                    <td class="uk-text">
+                      ${formatTanggal(data.created_at) || ""}
+                    </td>
+                    <td class="uk-text">
+                      ${formatTanggal(data.updated_at) || ""}
+                    </td>
+                    <td>
+                      <a href="updateBlog.html?slug=${
+                        data.slug
+                      }" class="uk-button uk-button-primary update" >Update</a>
+                    </td>
+                    <td>
+                      <div class="uk-button uk-button-danger delete" data-id="${
+                        data.id
+                      }">Delete</div>
+                    </td>
+                  </tr>
+                `;
 
             // Tambahkan <tr> ke dalam <tbody> dengan jQuery
             $("#data").append(row);
@@ -290,6 +381,7 @@
       }
       // manggil fungsi untuk memuat data blog terbaru
       loadBlog();
+
       $(document).on("click", ".delete", async function () {
         // ambil data berdasarkan id di atribut div foreach
         let id = $(this).attr("data-id");
