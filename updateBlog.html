@@ -260,6 +260,21 @@
     <script type="module">
       let base_url = "https://primdev.alwaysdata.net/api/blog"; // base url dari API
 
+      function getCookie(name) {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.startsWith(name + "=")) {
+            return JSON.parse(
+              decodeURIComponent(cookie.substring(name.length + 1))
+            );
+          }
+        }
+        return null; // Return null if cookie not found
+      }
+
+      const token = getCookie("token");
+      const user = getCookie("user");
       // function ambil data berdasarkan slug yang ada di permasing masing id
       async function ambilDataBlog(slug) {
         try {
@@ -267,7 +282,7 @@
             method: "GET",
             headers: {
               Authorization: `Bearer ${token.token}`,
-              "Content-Type": "application/json",
+              "Content-Typ": "application/json",
             },
           });
 
